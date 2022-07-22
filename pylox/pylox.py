@@ -1,5 +1,7 @@
 import sys
 
+from scanner.scanner import Scanner
+
 had_error = False;
 
 def run_prompt():
@@ -14,7 +16,11 @@ def run_file(path):
         run(f.read())
 
 def run(source):
-    print(source)
+    scanner = Scanner(source)
+    tokens = scanner.scan_tokens()
+
+    for token in tokens:
+        print(token)
 
 def error(line, message):
     report(line, '', message)
