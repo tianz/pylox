@@ -24,7 +24,6 @@ def report(line, where, message):
     had_error = True;
 
 if __name__ == '__main__':
-    print(sys.argv)
     if len(sys.argv) == 1:
         run_prompt()
     elif len(sys.argv) == 2:
