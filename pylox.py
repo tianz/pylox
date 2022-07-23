@@ -2,23 +2,31 @@ import sys
 
 from pylox.scanner.scanner import Scanner
 
+had_error = False
+
 def run_prompt():
+    global had_error
     while True:
         line = input('> ')
         if line is None:
             break
         run(line)
+        had_error = False
 
 def run_file(path):
     with open(path) as f:
         run(f.read())
 
+        if had_error:
+            sys.exit(65)
+
 def run(source):
+    global had_error
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
 
     if scanner.had_error:
-        sys.exit(65)
+        had_error = True
 
     for token in tokens:
         print(token)
