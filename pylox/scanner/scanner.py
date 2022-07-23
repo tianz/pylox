@@ -8,6 +8,24 @@ class Scanner:
         self.start = 0
         self.current = 0
         self.line = 1
+        self.keywords = {
+            'and': TokenType.AND,
+            'class': TokenType.CLASS,
+            'else': TokenType.ELSE,
+            'false': TokenType.FALSE,
+            'for': TokenType.FOR,
+            'fun': TokenType.FUN,
+            'if': TokenType.IF,
+            'nil': TokenType.NIL,
+            'or': TokenType.OR,
+            'print': TokenType.PRINT,
+            'return': TokenType.RETURN,
+            'super': TokenType.SUPER,
+            'this': TokenType.THIS,
+            'true': TokenType.TRUE,
+            'var': TokenType.VAR,
+            'while': TokenType.WHILE,
+        }
         self.had_error = False
 
     def scan_tokens(self):
@@ -21,6 +39,7 @@ class Scanner:
     def scan_token(self):
         c = self.advance()
         match c:
+            # single-character tokens
             case '(':
                 self.add_token(TokenType.LEFT_PAREN)
             case ')':
@@ -41,14 +60,6 @@ class Scanner:
                 self.add_token(TokenType.SEMICOLON)
             case '*':
                 self.add_token(TokenType.STAR)
-            case '!':
-                self.add_token(TokenType.BANG_EQUAL if self.match('=') else TokenType.BANG)
-            case '=':
-                self.add_token(TokenType.EQUAL_EQUAL if self.match('=') else TokenType.EQUAL)
-            case '<':
-                self.add_token(TokenType.LESS_EQUAL if self.match('=') else TokenType.LESS)
-            case '>':
-                self.add_token(TokenType.GREATER_EQUAL if self.match('=') else TokenType.GREATER)
             case '/':
                 if self.match('/'):
                     # a comment gose until the end of the line
@@ -57,13 +68,69 @@ class Scanner:
                 else:
                     # only one slash, not a comment
                     self.add_token(TokenType.SLASH)
+            # one or two character tokens
+            case '!':
+                self.add_token(TokenType.BANG_EQUAL if self.match('=') else TokenType.BANG)
+            case '=':
+                self.add_token(TokenType.EQUAL_EQUAL if self.match('=') else TokenType.EQUAL)
+            case '<':
+                self.add_token(TokenType.LESS_EQUAL if self.match('=') else TokenType.LESS)
+            case '>':
+                self.add_token(TokenType.GREATER_EQUAL if self.match('=') else TokenType.GREATER)
+                string()
+            # whitespaces
             case '\n':
                 self.line += 1
             case ' ' | '\r' | '\t':
                 pass
+            # literals
+            case '"':
+                self.string()
             case _:
-                error.error(self.line, 'Unexpected character.')
-                self.had_error = True
+                if c.isdigit():
+                    self.number()
+                elif c.isalpha():
+                    self.identifier()
+                else:
+                    error.error(self.line, 'Unexpected character.')
+                    self.had_error = True
+
+    def string(self):
+        while self.peek() != '"' and not self.is_at_end():
+            if self.peek() == '\n':
+                self.line += 1
+            self.advance()
+
+        if self.is_at_end():
+            error.error(self.line, 'Unterminated string.')
+            return
+
+        # the closing "
+        self.advance()
+
+        self.add_token(TokenType.STRING, self.source[self.start + 1 : self.current - 1])
+
+    def number(self):
+        while self.peek().isdigit():
+            self.advance()
+
+        # look for a fractional part
+        if self.peek() == '.' and self.peek_next().is_digit():
+            # consume the '.'
+            self.advance()
+
+            while self.peek().is_digit():
+                self.advance()
+
+        self.add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
+
+    def identifier(self):
+        while self.peek().isalnum():
+            self.advance()
+
+        text = self.source[self.start : self.current]
+        type = self.keywords.get(text, TokenType.IDENTIFIER)
+        self.add_token(type)
 
     def advance(self):
         c = self.source[self.current]
@@ -83,6 +150,11 @@ class Scanner:
         if self.is_at_end():
             return '\0'
         return self.source[self.current]
+
+    def peek_next(self):
+        if self.current + 1 >= len(self.source):
+            return '\0'
+        return self.source[self.current + 1]
 
     def add_token(self, type, literal=None):
         text = self.source[self.start : self.current]
