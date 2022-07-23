@@ -1,8 +1,6 @@
 import sys
 
-from scanner.scanner import Scanner
-
-had_error = False;
+from pylox.scanner.scanner import Scanner
 
 def run_prompt():
     while True:
@@ -19,15 +17,11 @@ def run(source):
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
 
+    if scanner.had_error:
+        sys.exit(65)
+
     for token in tokens:
         print(token)
-
-def error(line, message):
-    report(line, '', message)
-
-def report(line, where, message):
-    print(f'[line {line}] Error{where}: {message}')
-    had_error = True;
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
