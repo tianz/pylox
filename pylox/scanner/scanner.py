@@ -1,5 +1,5 @@
 from .token import Token, TokenType
-from ..error import error
+from ..error.error import report
 
 class Scanner:
     def __init__(self, source):
@@ -102,7 +102,7 @@ class Scanner:
             self.advance()
 
         if self.is_at_end():
-            error.error(self.line, 'Unterminated string.')
+            self.__report_error(self.line, 'Unterminated string.')
             return
 
         # the closing "
@@ -162,3 +162,6 @@ class Scanner:
 
     def is_at_end(self):
         return self.current >= len(self.source)
+
+    def __report_error(self, line, message):
+        report(line, "", message)

@@ -1,6 +1,8 @@
 import sys
 
 from pylox.scanner.scanner import Scanner
+from pylox.parser.parser import Parser
+from pylox.ast.printer import AstPrinter
 
 had_error = False
 
@@ -22,14 +24,20 @@ def run_file(path):
 
 def run(source):
     global had_error
+
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
-
     if scanner.had_error:
         had_error = True
+        return
 
-    for token in tokens:
-        print(token)
+    parser = Parser(tokens)
+    expression = parser.parse()
+    if parser.had_error:
+        had_error = True
+        return
+
+    print(AstPrinter().print(expression))
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
