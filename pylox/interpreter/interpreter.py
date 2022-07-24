@@ -74,6 +74,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return None
 
+    def visit_assign_expr(self, expr):
+        value = self.__evaluate(expr.value)
+        self.environment.assign(expr.name, value)
+        return value
+
     def visit_variable_expr(self, expr):
         return self.environment.get(expr.name)
 

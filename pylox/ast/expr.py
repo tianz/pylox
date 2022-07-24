@@ -1,6 +1,15 @@
 from abc import ABC, abstractmethod
 
+class Expr(ABC):
+    @abstractmethod
+    def accept(self, visitor):
+        pass
+
 class ExprVisitor(ABC):
+    @abstractmethod
+    def visit_assign_expr(self, expr):
+        pass
+
     @abstractmethod
     def visit_binary_expr(self, expr):
         pass
@@ -21,10 +30,13 @@ class ExprVisitor(ABC):
     def visit_variable_expr(self, expr):
         pass
 
-class Expr(ABC):
-    @abstractmethod
+class Assign(Expr):
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
     def accept(self, visitor):
-        pass
+        return visitor.visit_assign_expr(self)
 
 class Binary(Expr):
     def __init__(self, left, operator, right):
