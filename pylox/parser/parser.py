@@ -1,6 +1,6 @@
 from pylox.scanner.token import TokenType
-from pylox.ast.expr import Binary, Grouping, Literal, Unary
-from pylox.ast.stmt import Print, Expression
+import pylox.ast.expr as Expr
+import pylox.ast.stmt as Stmt
 from .parser_error import ParserError
 from ..error.error import report
 
@@ -13,9 +13,24 @@ class Parser:
     def parse(self):
         statements = []
         while not self.__is_at_end():
-            statements.append(self.__statement())
+            statements.append(self.__declaration())
 
         return statements
+
+    def __declaration(self):
+        try:
+            if self.__match(TokenType.VAR):
+                return self.__var_declaration()
+            return self.__statement()
+        except ParserError:
+            self.__synchronize()
+            return None
+
+    def __var_declaration(self):
+        name = self.__consume(TokenType.IDENTIFIER, 'Expect variable name.')
+        initializer = self.__expression() if self.__match(TokenType.EQUAL) else None
+        self.__consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        return Stmt.Var(name, initializer)
 
     def __statement(self):
         if self.__match(TokenType.PRINT):
@@ -26,12 +41,12 @@ class Parser:
     def __print_statement(self):
         value = self.__expression()
         self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
-        return Print(value)
+        return Stmt.Print(value)
 
     def __expression_statement(self):
         expr = self.__expression()
         self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
-        return Expression(expr)
+        return Stmt.Expression(expr)
 
     def __expression(self):
         return self.__equality()
@@ -42,7 +57,7 @@ class Parser:
         while self.__match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
             operator = self.__previous()
             right = self.__comparison()
-            expr = Binary(expr, operator, right)
+            expr = Expr.Binary(expr, operator, right)
 
         return expr
 
@@ -52,7 +67,7 @@ class Parser:
         while self.__match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL):
             operator = self.__previous()
             right = self.__term()
-            expr = Binary(expr, operator, right)
+            expr = Expr.Binary(expr, operator, right)
 
         return expr
 
@@ -62,7 +77,7 @@ class Parser:
         while self.__match(TokenType.MINUS, TokenType.PLUS):
             operator = self.__previous()
             right = self.__factor()
-            expr = Binary(expr, operator, right)
+            expr = Expr.Binary(expr, operator, right)
 
         return expr
 
@@ -72,7 +87,7 @@ class Parser:
         while self.__match(TokenType.SLASH, TokenType.STAR):
             operator = self.__previous()
             right = self.__unary()
-            expr = Binary(expr, operator, right)
+            expr = Expr.Binary(expr, operator, right)
 
         return expr
 
@@ -80,23 +95,25 @@ class Parser:
         if self.__match(TokenType.BANG, TokenType.MINUS):
             operator = self.__previous()
             right = self.__unary()
-            return Unary(operator, right)
+            return Expr.Unary(operator, right)
 
         return self.__primary()
 
     def __primary(self):
         if self.__match(TokenType.FALSE):
-            return Literal(False)
+            return Expr.Literal(False)
         if self.__match(TokenType.TRUE):
-            return Literal(True)
+            return Expr.Literal(True)
         if self.__match(TokenType.NIL):
-            return Literal(None)
+            return Expr.Literal(None)
         if self.__match(TokenType.NUMBER, TokenType.STRING):
-            return Literal(self.__previous().literal)
+            return Expr.Literal(self.__previous().literal)
+        if self.__match(TokenType.IDENTIFIER):
+            return Expr.Variable(self.__previous())
         if self.__match(TokenType.LEFT_PAREN):
             expr = self.__expression()
             self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return Grouping(expr)
+            return Expr.Grouping(expr)
 
         raise self.__error(self.__peek(), 'Expect expression.')
 
