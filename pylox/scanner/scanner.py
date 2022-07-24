@@ -77,7 +77,7 @@ class Scanner:
                 self.add_token(TokenType.LESS_EQUAL if self.match('=') else TokenType.LESS)
             case '>':
                 self.add_token(TokenType.GREATER_EQUAL if self.match('=') else TokenType.GREATER)
-                string()
+                self.string()
             # whitespaces
             case '\n':
                 self.line += 1

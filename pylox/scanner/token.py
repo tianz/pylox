@@ -56,5 +56,11 @@ class Token:
         self.literal = literal
         self.line = line
 
+    def __eq__(self, other):
+        return self.type == other.type \
+            and self.lexeme == other.lexeme \
+            and self.literal == other.literal \
+            and self.line == other.line
+
     def __str__(self):
         return f'{self.type} {self.lexeme} {self.literal}'
