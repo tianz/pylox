@@ -39,12 +39,12 @@ def run(source):
         return
 
     parser = Parser(tokens)
-    expression = parser.parse()
+    statements = parser.parse()
     if parser.had_error:
         had_error = True
         return
 
-    interpreter.interpret(expression)
+    interpreter.interpret(statements)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:

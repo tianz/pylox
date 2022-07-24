@@ -158,4 +158,4 @@ class Parser:
             self.__advance()
 
     def __is_at_end(self):
-        return self.__peek() == TokenType.EOF
+        return self.__peek().type == TokenType.EOF

@@ -1,15 +1,16 @@
 from pylox.ast.expr import ExprVisitor
+from pylox.ast.stmt import StmtVisitor
 from pylox.scanner.scanner import TokenType
 from .runtime_error import RuntimeError
 
-class Interpreter(ExprVisitor):
+class Interpreter(ExprVisitor, StmtVisitor):
     def __init__(self):
         self.had_error = False
 
-    def interpret(self, expression):
+    def interpret(self, statements):
         try:
-            value = self.__evaluate(expression)
-            print(self.__stringify(value))
+            for statement in statements:
+                self.__execute(statement)
         except RuntimeError as err:
             print(f'{err.message}\n[line {err.token.line}]')
             self.had_error = True
@@ -71,8 +72,20 @@ class Interpreter(ExprVisitor):
 
         return None
 
+    def visit_expression_stmt(self, stmt):
+        self.__evaluate(stmt.expression)
+        return None
+
+    def visit_print_stmt(self, stmt):
+        value = self.__evaluate(stmt.expression)
+        print(self.__stringify(value))
+        return None
+
     def __evaluate(self, expr):
         return expr.accept(self)
+
+    def __execute(self, stmt):
+        return stmt.accept(self)
 
     def __is_truthy(self, obj):
         if obj is None:
@@ -110,5 +123,7 @@ class Interpreter(ExprVisitor):
             if text.endswith('.0'):
                 text = text[:len(text) - 2]
             return text
+        if isinstance(obj, bool):
+            return str(obj).lower()
 
         return str(obj)
