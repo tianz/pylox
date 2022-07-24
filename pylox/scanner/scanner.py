@@ -29,55 +29,55 @@ class Scanner:
         self.had_error = False
 
     def scan_tokens(self):
-        while not self.is_at_end():
+        while not self.__is_at_end():
             self.start = self.current
-            self.scan_token()
+            self.__scan_token()
 
         self.tokens.append(Token(TokenType.EOF, '', None, self.line))
         return self.tokens
 
-    def scan_token(self):
-        c = self.advance()
+    def __scan_token(self):
+        c = self.__advance()
         match c:
             # single-character tokens
             case '(':
-                self.add_token(TokenType.LEFT_PAREN)
+                self.__add_token(TokenType.LEFT_PAREN)
             case ')':
-                self.add_token(TokenType.RIGHT_PAREN)
+                self.__add_token(TokenType.RIGHT_PAREN)
             case '{':
-                self.add_token(TokenType.LEFT_BRACE)
+                self.__add_token(TokenType.LEFT_BRACE)
             case '}':
-                self.add_token(TokenType.RIGHT_BRACE)
+                self.__add_token(TokenType.RIGHT_BRACE)
             case ',':
-                self.add_token(TokenType.COMMA)
+                self.__add_token(TokenType.COMMA)
             case '.':
-                self.add_token(TokenType.DOT)
+                self.__add_token(TokenType.DOT)
             case '-':
-                self.add_token(TokenType.MINUS)
+                self.__add_token(TokenType.MINUS)
             case '+':
-                self.add_token(TokenType.PLUS)
+                self.__add_token(TokenType.PLUS)
             case ';':
-                self.add_token(TokenType.SEMICOLON)
+                self.__add_token(TokenType.SEMICOLON)
             case '*':
-                self.add_token(TokenType.STAR)
+                self.__add_token(TokenType.STAR)
             case '/':
-                if self.match('/'):
+                if self.__match('/'):
                     # a comment gose until the end of the line
-                    while self.peek() != '\n' and not self.is_at_end():
-                        self.advance()
+                    while self.__peek() != '\n' and not self.__is_at_end():
+                        self.__advance()
                 else:
                     # only one slash, not a comment
-                    self.add_token(TokenType.SLASH)
+                    self.__add_token(TokenType.SLASH)
             # one or two character tokens
             case '!':
-                self.add_token(TokenType.BANG_EQUAL if self.match('=') else TokenType.BANG)
+                self.__add_token(TokenType.BANG_EQUAL if self.__match('=') else TokenType.BANG)
             case '=':
-                self.add_token(TokenType.EQUAL_EQUAL if self.match('=') else TokenType.EQUAL)
+                self.__add_token(TokenType.EQUAL_EQUAL if self.__match('=') else TokenType.EQUAL)
             case '<':
-                self.add_token(TokenType.LESS_EQUAL if self.match('=') else TokenType.LESS)
+                self.__add_token(TokenType.LESS_EQUAL if self.__match('=') else TokenType.LESS)
             case '>':
-                self.add_token(TokenType.GREATER_EQUAL if self.match('=') else TokenType.GREATER)
-                self.string()
+                self.__add_token(TokenType.GREATER_EQUAL if self.__match('=') else TokenType.GREATER)
+                self.__string()
             # whitespaces
             case '\n':
                 self.line += 1
@@ -85,60 +85,60 @@ class Scanner:
                 pass
             # literals
             case '"':
-                self.string()
+                self.__string()
             case _:
                 if c.isdigit():
-                    self.number()
+                    self.__number()
                 elif c.isalpha():
-                    self.identifier()
+                    self.__identifier()
                 else:
                     self.__report_error(self.line, 'Unexpected character.')
                     self.had_error = True
 
-    def string(self):
-        while self.peek() != '"' and not self.is_at_end():
-            if self.peek() == '\n':
+    def __string(self):
+        while self.__peek() != '"' and not self.__is_at_end():
+            if self.__peek() == '\n':
                 self.line += 1
-            self.advance()
+            self.__advance()
 
-        if self.is_at_end():
+        if self.__is_at_end():
             self.__report_error(self.line, 'Unterminated string.')
             return
 
         # the closing "
-        self.advance()
+        self.__advance()
 
-        self.add_token(TokenType.STRING, self.source[self.start + 1 : self.current - 1])
+        self.__add_token(TokenType.STRING, self.source[self.start + 1 : self.current - 1])
 
-    def number(self):
-        while self.peek().isdigit():
-            self.advance()
+    def __number(self):
+        while self.__peek().isdigit():
+            self.__advance()
 
         # look for a fractional part
-        if self.peek() == '.' and self.peek_next().isdigit():
+        if self.__peek() == '.' and self.__peek_next().isdigit():
             # consume the '.'
-            self.advance()
+            self.__advance()
 
-            while self.peek().isdigit():
-                self.advance()
+            while self.__peek().isdigit():
+                self.__advance()
 
-        self.add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
+        self.__add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
 
-    def identifier(self):
-        while self.peek().isalnum():
-            self.advance()
+    def __identifier(self):
+        while self.__peek().isalnum():
+            self.__advance()
 
         text = self.source[self.start : self.current]
         type = self.keywords.get(text, TokenType.IDENTIFIER)
-        self.add_token(type)
+        self.__add_token(type)
 
-    def advance(self):
+    def __advance(self):
         c = self.source[self.current]
         self.current += 1
         return c
 
-    def match(self, expected):
-        if self.is_at_end():
+    def __match(self, expected):
+        if self.__is_at_end():
             return False
         if self.source[self.current] != expected:
             return False
@@ -146,21 +146,21 @@ class Scanner:
         self.current += 1
         return True
 
-    def peek(self):
-        if self.is_at_end():
+    def __peek(self):
+        if self.__is_at_end():
             return '\0'
         return self.source[self.current]
 
-    def peek_next(self):
+    def __peek_next(self):
         if self.current + 1 >= len(self.source):
             return '\0'
         return self.source[self.current + 1]
 
-    def add_token(self, type, literal=None):
+    def __add_token(self, type, literal=None):
         text = self.source[self.start : self.current]
         self.tokens.append(Token(type, text, literal, self.line))
 
-    def is_at_end(self):
+    def __is_at_end(self):
         return self.current >= len(self.source)
 
     def __report_error(self, line, message):

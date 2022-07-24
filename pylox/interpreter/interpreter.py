@@ -1,4 +1,3 @@
-from numpy import isin
 from pylox.ast.expr import ExprVisitor
 from pylox.scanner.scanner import TokenType
 from .runtime_error import RuntimeError
