@@ -92,7 +92,7 @@ class Scanner:
                 elif c.isalpha():
                     self.identifier()
                 else:
-                    error.error(self.line, 'Unexpected character.')
+                    self.__report_error(self.line, 'Unexpected character.')
                     self.had_error = True
 
     def string(self):
@@ -115,11 +115,11 @@ class Scanner:
             self.advance()
 
         # look for a fractional part
-        if self.peek() == '.' and self.peek_next().is_digit():
+        if self.peek() == '.' and self.peek_next().isdigit():
             # consume the '.'
             self.advance()
 
-            while self.peek().is_digit():
+            while self.peek().isdigit():
                 self.advance()
 
         self.add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
