@@ -60,3 +60,6 @@ class Unary(Expr):
 class Variable(Expr):
     def __init__(self, name):
         self.name = name
+
+    def accept(self, visitor):
+        return visitor.visit_variable_expr(self)

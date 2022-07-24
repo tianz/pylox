@@ -1,10 +1,12 @@
 from pylox.ast.expr import ExprVisitor
 from pylox.ast.stmt import StmtVisitor
+from pylox.environment.environment import Environment
 from pylox.scanner.scanner import TokenType
 from .runtime_error import RuntimeError
 
 class Interpreter(ExprVisitor, StmtVisitor):
     def __init__(self):
+        self.environment = Environment()
         self.had_error = False
 
     def interpret(self, statements):
@@ -72,6 +74,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return None
 
+    def visit_variable_expr(self, expr):
+        return self.environment.get(expr.name)
+
     def visit_expression_stmt(self, stmt):
         self.__evaluate(stmt.expression)
         return None
@@ -79,6 +84,14 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def visit_print_stmt(self, stmt):
         value = self.__evaluate(stmt.expression)
         print(self.__stringify(value))
+        return None
+
+    def visit_var_stmt(self, stmt):
+        value = None
+        if stmt.initializer != None:
+            value = self.__evaluate(stmt.initializer)
+
+        self.environment.define(stmt.name.lexeme, value)
         return None
 
     def __evaluate(self, expr):
