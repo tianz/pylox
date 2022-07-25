@@ -17,6 +17,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
             print(f'{err.message}\n[line {err.token.line}]')
             self.had_error = True
 
+    def visit_assign_expr(self, expr):
+        value = self.__evaluate(expr.value)
+        self.environment.assign(expr.name, value)
+        return value
+
     def visit_binary_expr(self, expr):
         left = self.__evaluate(expr.left)
         right = self.__evaluate(expr.right)
@@ -74,11 +79,6 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return None
 
-    def visit_assign_expr(self, expr):
-        value = self.__evaluate(expr.value)
-        self.environment.assign(expr.name, value)
-        return value
-
     def visit_variable_expr(self, expr):
         return self.environment.get(expr.name)
 
@@ -87,6 +87,14 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def visit_expression_stmt(self, stmt):
         self.__evaluate(stmt.expression)
+        return None
+
+    def visit_if_stmt(self, stmt):
+        if self.__is_truthy(stmt.condition):
+            self.__execute(stmt.if_branch)
+        elif stmt.else_branch:
+            self.__execute(stmt.else_branch)
+
         return None
 
     def visit_print_stmt(self, stmt):

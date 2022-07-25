@@ -41,15 +41,27 @@ class Parser:
 
         return self.__expression_statement()
 
-    def __print_statement(self):
-        value = self.__expression()
-        self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
-        return Stmt.Print(value)
-
     def __expression_statement(self):
         expr = self.__expression()
         self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
         return Stmt.Expression(expr)
+
+    def __if_statement(self):
+        self.__consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")
+        condition = self.__expression()
+        self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.")
+
+        then_branch = self.__statement()
+        else_branch = None
+        if (self.__match(TokenType.ELSE)):
+            else_branch = self.__statement()
+
+        return Stmt.If(condition, then_branch, else_branch)
+
+    def __print_statement(self):
+        value = self.__expression()
+        self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return Stmt.Print(value)
 
     def __block(self):
         statements = []
