@@ -2,6 +2,10 @@ from abc import ABC, abstractmethod
 
 class StmtVisitor(ABC):
     @abstractmethod
+    def visit_block_stmt(self, stmt):
+        pass
+
+    @abstractmethod
     def visit_expression_stmt(self, stmt):
         pass
 
@@ -17,6 +21,13 @@ class Stmt(ABC):
     @abstractmethod
     def accept(self, visitor):
         pass
+
+class Block(Stmt):
+    def __init__(self, statements):
+        self.statements = statements
+
+    def accept(self, visitor):
+        return visitor.visit_block_stmt(self)
 
 class Expression(Stmt):
     def __init__(self, expression):

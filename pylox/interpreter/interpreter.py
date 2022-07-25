@@ -82,6 +82,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def visit_variable_expr(self, expr):
         return self.environment.get(expr.name)
 
+    def visit_block_stmt(self, stmt):
+        self.__execute_block(stmt.statements, Environment(self.environment))
+
     def visit_expression_stmt(self, stmt):
         self.__evaluate(stmt.expression)
         return None
@@ -101,6 +104,16 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def __evaluate(self, expr):
         return expr.accept(self)
+
+    def __execute_block(self, statements, environment):
+        previous_env = self.environment
+
+        try:
+            self.environment = environment
+            for statement in statements:
+                self.__execute(statement)
+        finally:
+            self.environment = previous_env
 
     def __execute(self, stmt):
         return stmt.accept(self)

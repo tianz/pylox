@@ -1,3 +1,4 @@
+from re import L
 from pylox.scanner.token import TokenType
 import pylox.ast.expr as Expr
 import pylox.ast.stmt as Stmt
@@ -35,6 +36,8 @@ class Parser:
     def __statement(self):
         if self.__match(TokenType.PRINT):
             return self.__print_statement()
+        if self.__match(TokenType.LEFT_BRACE):
+            return Stmt.Block(self.__block())
 
         return self.__expression_statement()
 
@@ -47,6 +50,15 @@ class Parser:
         expr = self.__expression()
         self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
         return Stmt.Expression(expr)
+
+    def __block(self):
+        statements = []
+
+        while not self.__check(TokenType.RIGHT_BRACE) and not self.__is_at_end():
+            statements.append(self.__declaration())
+
+        self.__consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
+        return statements
 
     def __expression(self):
         return self.__assignment()
