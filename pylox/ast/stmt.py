@@ -46,6 +46,9 @@ class If(Stmt):
         self.then_branch = then_branch
         self.else_branch = else_branch
 
+    def accept(self, visitor):
+        return visitor.visit_if_stmt(self)
+
 class Print(Stmt):
     def __init__(self, expression):
         self.expression = expression

@@ -63,4 +63,4 @@ class Token:
             and self.line == other.line
 
     def __str__(self):
-        return f'{self.type} {self.lexeme} {self.literal}'
+        return f"Token {{ type={self.type} lexeme='{self.lexeme}' literal={self.literal} }}"

@@ -47,6 +47,9 @@ class Binary(Expr):
     def accept(self, visitor):
         return visitor.visit_binary_expr(self)
 
+    def __str__(self):
+        return f'Binary {{ left={self.left} operator={self.operator} right={self.right} }}'
+
 class Grouping(Expr):
     def __init__(self, expression):
         self.expression = expression

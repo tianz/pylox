@@ -34,6 +34,8 @@ class Parser:
         return Stmt.Var(name, initializer)
 
     def __statement(self):
+        if self.__match(TokenType.IF):
+            return self.__if_statement()
         if self.__match(TokenType.PRINT):
             return self.__print_statement()
         if self.__match(TokenType.LEFT_BRACE):

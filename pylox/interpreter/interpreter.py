@@ -90,8 +90,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
         return None
 
     def visit_if_stmt(self, stmt):
-        if self.__is_truthy(stmt.condition):
-            self.__execute(stmt.if_branch)
+        if self.__is_truthy(self.__evaluate(stmt.condition)):
+            self.__execute(stmt.then_branch)
         elif stmt.else_branch:
             self.__execute(stmt.else_branch)
 
