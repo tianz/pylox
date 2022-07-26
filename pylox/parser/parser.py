@@ -19,12 +19,35 @@ class Parser:
 
     def __declaration(self):
         try:
+            if self.__match(TokenType.FUN):
+                return self.__function('function')
             if self.__match(TokenType.VAR):
                 return self.__var_declaration()
             return self.__statement()
         except ParserError:
             self.__synchronize()
             return None
+
+    def __function(self, kind):
+        # header
+        name = self.__consume(TokenType.IDENTIFIER, f'Expect {kind} name.')
+        parameters = []
+
+        if not self.__check(TokenType.RIGHT_PAREN):
+            parameters.append(self.__consume(TokenType.IDENTIFIER, 'Expect parameter name.'))
+
+            while self.__match(TokenType.COMMA):
+                if (len(parameters) >= 255):
+                    self.__error(self.__peek(), "Can't have more than 255 parameters.")
+                parameters.append(self.__consume(TokenType.IDENTIFIER, 'Expect parameter name.'))
+
+        self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+
+        # body
+        self.__consume(TokenType.LEFT_BRACE, f"Expect '{{' before {kind} body.")
+        body = self.__block()
+
+        return Stmt.Function(name, parameters, body)
 
     def __var_declaration(self):
         name = self.__consume(TokenType.IDENTIFIER, 'Expect variable name.')
