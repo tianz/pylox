@@ -125,6 +125,12 @@ class Interpreter(ExprVisitor, StmtVisitor):
         self.environment.define(stmt.name.lexeme, value)
         return None
 
+    def visit_while_stmt(self, stmt):
+        while self.__is_truthy(self.__evaluate(stmt.condition)):
+            self.__execute(stmt.body)
+
+        return None
+
     def __evaluate(self, expr):
         return expr.accept(self)
 

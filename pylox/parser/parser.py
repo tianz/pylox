@@ -37,6 +37,8 @@ class Parser:
             return self.__if_statement()
         if self.__match(TokenType.PRINT):
             return self.__print_statement()
+        if self.__match(TokenType.WHILE):
+            return self.__while_statement()
         if self.__match(TokenType.LEFT_BRACE):
             return Stmt.Block(self.__block())
 
@@ -54,7 +56,7 @@ class Parser:
 
         then_branch = self.__statement()
         else_branch = None
-        if (self.__match(TokenType.ELSE)):
+        if self.__match(TokenType.ELSE):
             else_branch = self.__statement()
 
         return Stmt.If(condition, then_branch, else_branch)
@@ -63,6 +65,14 @@ class Parser:
         value = self.__expression()
         self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
         return Stmt.Print(value)
+
+    def __while_statement(self):
+        self.__consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
+        condition = self.__expression()
+        self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after 'while'.")
+        body = self.__statement()
+
+        return Stmt.While(condition, body)
 
     def __block(self):
         statements = []
