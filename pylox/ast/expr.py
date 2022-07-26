@@ -58,7 +58,7 @@ class Binary(Expr):
     def __str__(self):
         return f'Binary {{ left={self.left} operator={self.operator} right={self.right} }}'
 
-def Call(Expr):
+class Call(Expr):
     def __init__(self, callee, paren, arguments):
         self.callee = callee
         self.paren = paren

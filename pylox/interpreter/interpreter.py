@@ -2,12 +2,15 @@ from pylox.ast.expr import ExprVisitor
 from pylox.ast.stmt import StmtVisitor
 from pylox.environment.environment import Environment
 from pylox.function.function import Callable
+import pylox.function.native as Native
 from pylox.scanner.scanner import TokenType
 from .runtime_error import RuntimeError
 
 class Interpreter(ExprVisitor, StmtVisitor):
     def __init__(self):
-        self.environment = Environment()
+        self.globals = Environment()
+        self.globals.define("clock", Native.Clock())
+        self.environment = self.globals
         self.had_error = False
 
     def interpret(self, statements):
@@ -111,6 +114,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def visit_block_stmt(self, stmt):
         self.__execute_block(stmt.statements, Environment(self.environment))
+        return None
 
     def visit_expression_stmt(self, stmt):
         self.__evaluate(stmt.expression)

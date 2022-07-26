@@ -205,6 +205,8 @@ class Parser:
 
     def __call(self):
         def finish_call(callee):
+            arguments = []
+
             if not self.__check(TokenType.RIGHT_PAREN):
                 arguments = [self.__expression()]
                 while self.__match(TokenType.COMMA):
