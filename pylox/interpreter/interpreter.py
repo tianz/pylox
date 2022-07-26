@@ -67,6 +67,21 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def visit_literal_expr(self, expr):
         return expr.value
 
+    def visit_logical_expr(self, expr):
+        left = self.__evaluate(expr.left)
+
+        # short circuit: if left is true in an OR expression,
+        # or if left is false in an AND expression,
+        # just return the left value
+        if expr.operator.type == TokenType.OR:
+            if self.__is_truthy(left):
+                return left
+        else:
+            if not self.__is_truthy(left):
+                return left
+
+        return self.__evaluate(expr.right)
+
     def visit_unary_expr(self, expr):
         right = self.__evaluate(expr.right)
 

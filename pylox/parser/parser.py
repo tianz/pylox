@@ -1,4 +1,3 @@
-from re import L
 from pylox.scanner.token import TokenType
 import pylox.ast.expr as Expr
 import pylox.ast.stmt as Stmt
@@ -78,7 +77,7 @@ class Parser:
         return self.__assignment()
 
     def __assignment(self):
-        expr = self.__equality()
+        expr = self.__or()
 
         if self.__match(TokenType.EQUAL):
             equals = self.__previous()
@@ -89,6 +88,26 @@ class Parser:
                 return Expr.Assign(name, value)
 
             self.__report_error(equals, 'Invalid assignment target.')
+
+        return expr
+
+    def __or(self):
+        expr = self.__and()
+
+        if self.__match(TokenType.OR):
+            operator = self.__previous()
+            right = self.__and()
+            expr = Expr.Logical(expr, operator, right)
+
+        return expr
+
+    def __and(self):
+        expr = self.__equality()
+
+        if self.__match(TokenType.AND):
+            operator = self.__previous()
+            right = self.__equality()
+            expr = Expr.Logical(expr, operator, right)
 
         return expr
 

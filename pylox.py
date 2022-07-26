@@ -1,7 +1,5 @@
 import sys
 
-from numpy import interp
-
 from pylox.interpreter.interpreter import Interpreter
 from pylox.parser.parser import Parser
 from pylox.scanner.scanner import Scanner
