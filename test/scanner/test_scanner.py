@@ -38,28 +38,45 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_parentheses(self):
-        expression = '(1 + 2)'
+        expression = '(1 + 20)'
         test_instance = Scanner(expression)
         actual = test_instance.scan_tokens()
         expected = [
             Token(TokenType.LEFT_PAREN, '(', None, 1),
             Token(TokenType.NUMBER, '1', 1.0, 1),
             Token(TokenType.PLUS, '+', None, 1),
-            Token(TokenType.NUMBER, '2', 2.0, 1),
+            Token(TokenType.NUMBER, '20', 20.0, 1),
             Token(TokenType.RIGHT_PAREN, ')', None, 1),
             self.eof_token,
         ]
 
         self.assertEqual(expected, actual)
 
+    def test_block(self):
+        block = '{\n a = "a";\n }'
+        test_instance = Scanner(block)
+        actual = test_instance.scan_tokens()
+        expected = [
+            Token(TokenType.LEFT_BRACE, '{', None, 1),
+            Token(TokenType.IDENTIFIER, 'a', None, 2),
+            Token(TokenType.EQUAL, '=', None, 2),
+            Token(TokenType.STRING, '"a"', 'a', 2),
+            Token(TokenType.SEMICOLON, ';', None, 2),
+            Token(TokenType.RIGHT_BRACE, '}', None, 3),
+            Token(TokenType.EOF, '', None, 3),
+        ]
+
+        self.assertEqual(expected, actual)
+
+
     def test_equality(self):
-        expression = 'a == b'
+        expression = 'value == a'
         test_instance = Scanner(expression)
         actual = test_instance.scan_tokens()
         expected = [
-            Token(TokenType.IDENTIFIER, 'a', None, 1),
+            Token(TokenType.IDENTIFIER, 'value', None, 1),
             Token(TokenType.EQUAL_EQUAL, '==', None, 1),
-            Token(TokenType.IDENTIFIER, 'b', None, 1),
+            Token(TokenType.IDENTIFIER, 'a', None, 1),
             self.eof_token,
         ]
 
