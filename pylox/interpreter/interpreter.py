@@ -1,6 +1,7 @@
 from pylox.ast.expr import ExprVisitor
 from pylox.ast.stmt import StmtVisitor
 from pylox.environment.environment import Environment
+from pylox.function.function import Callable
 from pylox.scanner.scanner import TokenType
 from .runtime_error import RuntimeError
 
@@ -60,6 +61,17 @@ class Interpreter(ExprVisitor, StmtVisitor):
                 return not self.__is_equal(left, right)
 
         return None
+
+    def visit_call_expr(self, expr):
+        callee = self.__evaluate(expr.callee)
+        if not isinstance(callee, Callable):
+            raise RuntimeError(expr.right_paren, 'Can only call functions and classes.')
+
+        arguments = [self.__evaluate(arg) for arg in expr.arguments]
+        if len(arguments) != callee.arity():
+            raise RuntimeError(expr.right_paren, f'Expected {callee.arity()} arguments but got {len(arguments)}.')
+
+        return callee.call(self, arguments)
 
     def visit_grouping_expr(self, expr):
         return self.__evaluate(expr.expression)
