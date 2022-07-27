@@ -1,7 +1,7 @@
 from pylox.ast.expr import ExprVisitor
 from pylox.ast.stmt import StmtVisitor
 from pylox.environment.environment import Environment
-from pylox.function.function import Callable
+from pylox.function.function import Callable, Function
 import pylox.function.native as Native
 from pylox.scanner.scanner import TokenType
 from .runtime_error import RuntimeError
@@ -113,11 +113,16 @@ class Interpreter(ExprVisitor, StmtVisitor):
         return self.environment.get(expr.name)
 
     def visit_block_stmt(self, stmt):
-        self.__execute_block(stmt.statements, Environment(self.environment))
+        self.execute_block(stmt.statements, Environment(self.environment))
         return None
 
     def visit_expression_stmt(self, stmt):
         self.__evaluate(stmt.expression)
+        return None
+
+    def visit_function_stmt(self, stmt):
+        function = Function(stmt)
+        self.environment.define(stmt.name.lexeme, function)
         return None
 
     def visit_if_stmt(self, stmt):
@@ -147,10 +152,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return None
 
-    def __evaluate(self, expr):
-        return expr.accept(self)
-
-    def __execute_block(self, statements, environment):
+    def execute_block(self, statements, environment):
         previous_env = self.environment
 
         try:
@@ -159,6 +161,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
                 self.__execute(statement)
         finally:
             self.environment = previous_env
+
+    def __evaluate(self, expr):
+        return expr.accept(self)
 
     def __execute(self, stmt):
         return stmt.accept(self)

@@ -31,6 +31,7 @@ class Parser:
     def __function(self, kind):
         # header
         name = self.__consume(TokenType.IDENTIFIER, f'Expect {kind} name.')
+        self.__consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind} name.")
         parameters = []
 
         if not self.__check(TokenType.RIGHT_PAREN):
@@ -233,7 +234,7 @@ class Parser:
             if not self.__check(TokenType.RIGHT_PAREN):
                 arguments = [self.__expression()]
                 while self.__match(TokenType.COMMA):
-                    arguments.appen(self.__expression())
+                    arguments.append(self.__expression())
 
                     if len(arguments) >= 255:
                         self.__error(self.__peek(), "Can't have more than 255 arguments.")
