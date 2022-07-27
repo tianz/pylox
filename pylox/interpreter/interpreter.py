@@ -2,6 +2,7 @@ from pylox.ast.expr import ExprVisitor
 from pylox.ast.stmt import StmtVisitor
 from pylox.environment.environment import Environment
 from pylox.function.function import Callable, Function
+from pylox.function.return_value import ReturnValue
 import pylox.function.native as Native
 from pylox.scanner.scanner import TokenType
 from .runtime_error import RuntimeError
@@ -137,6 +138,13 @@ class Interpreter(ExprVisitor, StmtVisitor):
         value = self.__evaluate(stmt.expression)
         print(self.__stringify(value))
         return None
+
+    def visit_return_stmt(self, stmt):
+        value = None
+        if (stmt.value != None):
+            value = self.__evaluate(stmt.value)
+
+        raise ReturnValue(value)
 
     def visit_var_stmt(self, stmt):
         value = None

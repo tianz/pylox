@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from .return_value import ReturnValue
 from pylox.environment.environment import Environment
 
 class Callable(ABC):
@@ -23,7 +24,11 @@ class Function(Callable):
         for i in range(len(self.declaration.params)):
             environment.define(self.declaration.params[i].lexeme, arguments[i])
 
-        interpreter.execute_block(self.declaration.body, environment)
+        try:
+            interpreter.execute_block(self.declaration.body, environment)
+        except ReturnValue as rv:
+            return rv.value
+
         return None
 
     def __str__(self):
