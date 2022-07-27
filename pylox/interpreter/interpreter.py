@@ -122,7 +122,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         return None
 
     def visit_function_stmt(self, stmt):
-        function = Function(stmt)
+        function = Function(stmt, self.environment)
         self.environment.define(stmt.name.lexeme, function)
         return None
 
