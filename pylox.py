@@ -2,6 +2,7 @@ import sys
 
 from pylox.interpreter.interpreter import Interpreter
 from pylox.parser.parser import Parser
+from pylox.resolver.resolver import Resolver
 from pylox.scanner.scanner import Scanner
 
 had_error = False
@@ -40,6 +41,9 @@ def run(source):
     if parser.had_error:
         had_error = True
         return
+
+    resolver = Resolver(interpreter)
+    resolver.resolve(statements)
 
     interpreter.interpret(statements)
 

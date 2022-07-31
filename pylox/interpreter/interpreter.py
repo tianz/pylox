@@ -12,6 +12,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         self.globals = Environment()
         self.globals.define("clock", Native.Clock())
         self.environment = self.globals
+        self.locals = {}
         self.had_error = False
 
     def interpret(self, statements):
@@ -24,7 +25,13 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def visit_assign_expr(self, expr):
         value = self.__evaluate(expr.value)
-        self.environment.assign(expr.name, value)
+
+        if expr in self.locals:
+            distance = self.locals[expr]
+            self.environment.assign_at(distance, expr.name, value)
+        else:
+            self.globals.assign(expr.name, value)
+
         return value
 
     def visit_binary_expr(self, expr):
@@ -111,7 +118,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         return None
 
     def visit_variable_expr(self, expr):
-        return self.environment.get(expr.name)
+        return self.__lookup_variable(expr.name, expr)
 
     def visit_block_stmt(self, stmt):
         self.execute_block(stmt.statements, Environment(self.environment))
@@ -170,6 +177,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
         finally:
             self.environment = previous_env
 
+    def resolve(expr, depth):
+        locals[expr] = depth
+
     def __evaluate(self, expr):
         return expr.accept(self)
 
@@ -216,3 +226,10 @@ class Interpreter(ExprVisitor, StmtVisitor):
             return str(obj).lower()
 
         return str(obj)
+
+    def __lookup_variable(self, name, expr):
+        if expr in self.locals:
+            distance = self.locals[expr]
+            return self.environment.get_at(distance, name.lexeme)
+        else:
+            return self.globals.get(name)

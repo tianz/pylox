@@ -9,7 +9,7 @@ class Resolver(ExprVisitor, StmtVisitor):
 
     def visit_block_stmt(self, stmt):
         self.__begin_scope()
-        self.__resolve(stmt.statements)
+        self.resolve(stmt.statements)
         self.__end_scope()
         return None
 
@@ -51,7 +51,7 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__resolve(stmt.body)
         return None
 
-    def visit_assignment_expr(self, expr):
+    def visit_assign_expr(self, expr):
         self.__resolve(expr.value)
         self.__resolve_local(expr, expr.name)
         return None
@@ -90,15 +90,15 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__resolve_local(expr, expr.name)
         return None
 
+    def resolve(self, statements):
+        for statement in statements:
+            self.__resolve(statement)
+
     def __begin_scope(self):
         self.scopes.append({})
 
     def __end_scope(self):
         self.scopes.pop()
-
-    def __resolve(self, statements):
-        for statement in statements:
-            self.__resolve(statement)
 
     def __resolve(self, stmt_or_expr):
         stmt_or_expr.accept(self)
