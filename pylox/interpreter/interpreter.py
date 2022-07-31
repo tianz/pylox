@@ -177,8 +177,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
         finally:
             self.environment = previous_env
 
-    def resolve(expr, depth):
-        locals[expr] = depth
+    def resolve(self, expr, depth):
+        self.locals[expr] = depth
 
     def __evaluate(self, expr):
         return expr.accept(self)

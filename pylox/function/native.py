@@ -1,4 +1,3 @@
-from ast import Call
 import time
 
 from .function import Callable

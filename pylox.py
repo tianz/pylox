@@ -44,6 +44,9 @@ def run(source):
 
     resolver = Resolver(interpreter)
     resolver.resolve(statements)
+    if resolver.had_error:
+        had_error = True
+        return
 
     interpreter.interpret(statements)
 

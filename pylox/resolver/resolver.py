@@ -1,11 +1,14 @@
 from pylox.ast.expr import ExprVisitor
 from pylox.ast.stmt import StmtVisitor
 import pylox.error.error as ErrorReporter
+from pylox.function.function import FunctionType
 
 class Resolver(ExprVisitor, StmtVisitor):
     def __init__(self, interpreter):
         self.interpreter = interpreter
         self.scopes = []
+        self.current_function = FunctionType.NONE
+        self.had_error = False
 
     def visit_block_stmt(self, stmt):
         self.__begin_scope()
@@ -20,7 +23,7 @@ class Resolver(ExprVisitor, StmtVisitor):
     def visit_function_stmt(self, stmt):
         self.__declare(stmt.name)
         self.__define(stmt.name) # define the function to allow recursion
-        self.__resolve_function(stmt)
+        self.__resolve_function(stmt, FunctionType.FUNCTION)
         return None
 
     def visit_if_stmt(self, stmt):
@@ -35,6 +38,10 @@ class Resolver(ExprVisitor, StmtVisitor):
         return None
 
     def visit_return_stmt(self, stmt):
+        if self.current_function == FunctionType.NONE:
+            ErrorReporter.token_error(stmt.keyword, "Can't return from top-level code.")
+            self.had_error = True
+
         if stmt.value is not None:
             self.__resolve(stmt.value)
         return None
@@ -63,7 +70,7 @@ class Resolver(ExprVisitor, StmtVisitor):
 
     def visit_call_expr(self, expr):
         self.__resolve(expr.callee)
-        for argument in expr.araguments:
+        for argument in expr.arguments:
             self.__resolve(argument)
         return None
 
@@ -107,7 +114,12 @@ class Resolver(ExprVisitor, StmtVisitor):
         if not self.scopes:
             return
 
-        self.scopes[-1][name_token.lexeme] = False # False means the name is not initialized
+        scope = self.scopes[-1]
+        if name_token.lexeme in scope:
+            ErrorReporter.token_error(name_token, 'Already a variable with this name in this scope.')
+            self.had_error = True
+
+        scope[name_token.lexeme] = False # False means the name is not initialized
 
     def __define(self, name_token):
         if not self.scopes:
@@ -121,11 +133,15 @@ class Resolver(ExprVisitor, StmtVisitor):
                 self.interpreter.resolve(expr, len(self.scopes) - 1 - i)
                 return
 
-    def __resolve_function(self, function):
+    def __resolve_function(self, function, function_type):
+        enclosing_function = self.current_function
+        self.current_function = function_type
+
         self.__begin_scope()
         for param in function.params:
             self.__declare(param)
             self.__define(param)
 
-        self.__resolve(function.body)
+        self.resolve(function.body)
         self.__end_scope()
+        self.current_function = enclosing_function

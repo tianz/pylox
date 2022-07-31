@@ -1,7 +1,12 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 
 from .return_value import ReturnValue
 from pylox.environment.environment import Environment
+
+class FunctionType(Enum):
+    NONE = 1
+    FUNCTION = 2
 
 class Callable(ABC):
     @abstractmethod
