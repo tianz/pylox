@@ -2,7 +2,7 @@ from pylox.scanner.token import TokenType
 import pylox.ast.expr as Expr
 import pylox.ast.stmt as Stmt
 from .parser_error import ParserError
-from ..error.error import report
+import pylox.error.error as ErrorReporter
 
 class Parser:
     def __init__(self, tokens):
@@ -166,7 +166,7 @@ class Parser:
                 name = expr.name
                 return Expr.Assign(name, value)
 
-            self.__report_error(equals, 'Invalid assignment target.')
+            ErrorReporter.token_error(equals, 'Invalid assignment target.')
 
         return expr
 
@@ -315,14 +315,8 @@ class Parser:
 
     def __error(self, token, message):
         self.had_error = True
-        self.__report_error(token, message)
+        ErrorReporter.token_error(token, message)
         return ParserError()
-
-    def __report_error(self, token, message):
-        if token.type == TokenType.EOF:
-            report(token.line, ' at end', message)
-        else:
-            report(token.line, " at '" + token.lexeme + "'", message)
 
     def __synchronize(self):
         self.__advance()

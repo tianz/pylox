@@ -1,5 +1,6 @@
+from msilib.schema import Error
 from .token import Token, TokenType
-from ..error.error import report
+import pylox.error.error as ErrorReporter
 
 class Scanner:
     def __init__(self, source):
@@ -92,7 +93,7 @@ class Scanner:
                 elif c.isalpha():
                     self.__identifier()
                 else:
-                    self.__report_error(self.line, 'Unexpected character.')
+                    ErrorReporter.line_error(self.line, 'Unexpected character.')
                     self.had_error = True
 
     def __string(self):
@@ -102,7 +103,7 @@ class Scanner:
             self.__advance()
 
         if self.__is_at_end():
-            self.__report_error(self.line, 'Unterminated string.')
+            ErrorReporter.line_error(self.line, 'Unterminated string.')
             return
 
         # the closing "
@@ -162,6 +163,3 @@ class Scanner:
 
     def __is_at_end(self):
         return self.current >= len(self.source)
-
-    def __report_error(self, line, message):
-        report(line, "", message)
