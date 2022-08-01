@@ -1,5 +1,6 @@
 from pylox.ast.expr import ExprVisitor
 from pylox.ast.stmt import StmtVisitor
+from pylox.lox_class.lox_class import Class
 from pylox.environment.environment import Environment
 from pylox.function.function import Callable, Function
 from pylox.function.return_value import ReturnValue
@@ -122,6 +123,12 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def visit_block_stmt(self, stmt):
         self.execute_block(stmt.statements, Environment(self.environment))
+        return None
+
+    def visit_class_stmt(self, stmt):
+        self.environment.define(stmt.name.lexeme, None)
+        klass = Class(stmt.name.lexeme)
+        self.environment.assign(stmt.name, klass)
         return None
 
     def visit_expression_stmt(self, stmt):
