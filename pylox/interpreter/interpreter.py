@@ -1,6 +1,6 @@
 from pylox.ast.expr import ExprVisitor
 from pylox.ast.stmt import StmtVisitor
-from pylox.lox_class.lox_class import Class
+from pylox.lox_class.lox_class import Class, Instance
 from pylox.environment.environment import Environment
 from pylox.function.function import Callable, Function
 from pylox.function.return_value import ReturnValue
@@ -84,6 +84,13 @@ class Interpreter(ExprVisitor, StmtVisitor):
             raise RuntimeError(expr.right_paren, f'Expected {callee.arity()} arguments but got {len(arguments)}.')
 
         return callee.call(self, arguments)
+
+    def visit_get_expr(self, expr):
+        object = self.__evaluate(expr)
+        if isinstance(object, Instance):
+            return object.get(expr.name)
+
+        raise RuntimeError(expr.name, "Only instances have properties")
 
     def visit_grouping_expr(self, expr):
         return self.__evaluate(expr.expression)

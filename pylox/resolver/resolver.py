@@ -79,6 +79,10 @@ class Resolver(ExprVisitor, StmtVisitor):
             self.__resolve(argument)
         return None
 
+    def visit_get_expr(self, expr):
+        self.__resolve(expr.object)
+        return None
+
     def visit_grouping_expr(self, expr):
         self.__resolve(expr.expression)
         return None

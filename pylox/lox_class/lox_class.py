@@ -1,4 +1,5 @@
 from pylox.function.function import Callable
+from pylox.interpreter.runtime_error import RuntimeError
 
 class Class(Callable):
     def __init__(self, name):
@@ -17,6 +18,13 @@ class Class(Callable):
 class Instance:
     def __init__(self, klass):
         self.klass = klass
+        self.fields = {}
+
+    def get(self, name):
+        if name.lexeme in self.fields:
+            return self.fields[name.lexeme]
+
+        raise RuntimeError(name, f"Undefined property '{name.lexeme}'.")
 
     def __str__(self):
         return self.klass.name + ' instance'
