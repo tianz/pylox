@@ -26,5 +26,8 @@ class Instance:
 
         raise RuntimeError(name, f"Undefined property '{name.lexeme}'.")
 
+    def set(self, name, value):
+        self.fields[name.lexeme] = value
+
     def __str__(self):
         return self.klass.name + ' instance'

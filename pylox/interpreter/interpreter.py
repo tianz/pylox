@@ -86,11 +86,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
         return callee.call(self, arguments)
 
     def visit_get_expr(self, expr):
-        object = self.__evaluate(expr)
+        object = self.__evaluate(expr.object)
         if isinstance(object, Instance):
             return object.get(expr.name)
 
-        raise RuntimeError(expr.name, "Only instances have properties")
+        raise RuntimeError(expr.name, 'Only instances have properties.')
 
     def visit_grouping_expr(self, expr):
         return self.__evaluate(expr.expression)
@@ -112,6 +112,15 @@ class Interpreter(ExprVisitor, StmtVisitor):
                 return left
 
         return self.__evaluate(expr.right)
+
+    def visit_set_expr(self, expr):
+        object = self.__evaluate(expr.object)
+        if not isinstance(object, Instance):
+            raise RuntimeError(expr.name, 'Only instances have fields.')
+
+        value = self.__evaluate(expr.value)
+        object.set(expr.name, value)
+        return value
 
     def visit_unary_expr(self, expr):
         right = self.__evaluate(expr.right)

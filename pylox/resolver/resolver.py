@@ -95,6 +95,11 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__resolve(expr.right)
         return None
 
+    def visit_set_expr(self, expr):
+        self.__resolve(expr.value)
+        self.__resolve(expr.object)
+        return None
+
     def visit_unary_expr(self, expr):
         self.__resolve(expr.right)
         return None

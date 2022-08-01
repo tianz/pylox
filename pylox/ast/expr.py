@@ -35,6 +35,10 @@ class ExprVisitor(ABC):
         pass
 
     @abstractmethod
+    def visit_set_expr(self, expr):
+        pass
+
+    @abstractmethod
     def visit_unary_expr(self, expr):
         pass
 
@@ -101,6 +105,15 @@ class Logical(Expr):
 
     def accept(self, visitor):
         return visitor.visit_logical_expr(self)
+
+class Set(Expr):
+    def __init__(self, object, name, value):
+        self.object = object
+        self.name = name
+        self.value = value
+
+    def accept(self, visitor):
+        return visitor.visit_set_expr(self)
 
 class Unary(Expr):
     def __init__(self, operator, right):

@@ -177,8 +177,9 @@ class Parser:
             value = self.__assignment()
 
             if isinstance(expr, Expr.Variable):
-                name = expr.name
-                return Expr.Assign(name, value)
+                return Expr.Assign(expr.name, value)
+            elif isinstance(expr, Expr.Get):
+                return Expr.Set(expr.object, expr.name, value)
 
             ErrorReporter.token_error(equals, 'Invalid assignment target.')
 
