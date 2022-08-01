@@ -2,8 +2,9 @@ from pylox.function.function import Callable
 from pylox.interpreter.runtime_error import RuntimeError
 
 class Class(Callable):
-    def __init__(self, name):
+    def __init__(self, name, methods):
         self.name = name
+        self.methods = methods
 
     def arity(self):
         return 0
@@ -11,6 +12,12 @@ class Class(Callable):
     def call(self, interpreter, arguments):
         instance = Instance(self)
         return instance
+
+    def find_method(self, name):
+        if name in self.methods:
+            return self.methods[name]
+
+        return None
 
     def __str__(self):
         return self.name
@@ -23,6 +30,10 @@ class Instance:
     def get(self, name):
         if name.lexeme in self.fields:
             return self.fields[name.lexeme]
+
+        method = self.klass.find_method(name.lexeme)
+        if method is not None:
+            return method
 
         raise RuntimeError(name, f"Undefined property '{name.lexeme}'.")
 

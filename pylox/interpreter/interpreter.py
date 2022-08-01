@@ -143,7 +143,12 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def visit_class_stmt(self, stmt):
         self.environment.define(stmt.name.lexeme, None)
-        klass = Class(stmt.name.lexeme)
+
+        methods = {}
+        for method in stmt.methods:
+            methods[method.name.lexeme] = Function(method, self.environment)
+
+        klass = Class(stmt.name.lexeme, methods)
         self.environment.assign(stmt.name, klass)
         return None
 

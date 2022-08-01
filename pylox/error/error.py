@@ -1,7 +1,7 @@
 from pylox.scanner.token import TokenType
 
-def line_error(line, where, message):
-    report(line, where, message)
+def line_error(line, message):
+    report(line, '', message)
 
 def token_error(token, message):
     if token.type == TokenType.EOF:

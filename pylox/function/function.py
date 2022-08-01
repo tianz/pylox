@@ -7,6 +7,7 @@ from pylox.environment.environment import Environment
 class FunctionType(Enum):
     NONE = 1
     FUNCTION = 2
+    METHOD = 3
 
 class Callable(ABC):
     @abstractmethod

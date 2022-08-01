@@ -19,6 +19,10 @@ class Resolver(ExprVisitor, StmtVisitor):
     def visit_class_stmt(self, stmt):
         self.__declare(stmt.name)
         self.__define(stmt.name)
+
+        for method in stmt.methods:
+            self.__resolve_function(method, FunctionType.METHOD)
+
         return None
 
     def visit_expression_stmt(self, stmt):
