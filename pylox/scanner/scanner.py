@@ -1,4 +1,3 @@
-from msilib.schema import Error
 from .token import Token, TokenType
 import pylox.error.error as ErrorReporter
 
