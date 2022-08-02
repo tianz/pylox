@@ -132,12 +132,11 @@ class Resolver(ExprVisitor, StmtVisitor):
         if not self.scopes:
             return
 
-        scope = self.scopes[-1]
-        if name_token.lexeme in scope:
+        if name_token.lexeme in self.scopes[-1]:
             ErrorReporter.token_error(name_token, 'Already a variable with this name in this scope.')
             self.had_error = True
 
-        scope[name_token.lexeme] = False # False means the name is not initialized
+        self.scopes[-1][name_token.lexeme] = False # False means the name is not initialized
 
     def __define(self, name_token):
         if not self.scopes:
