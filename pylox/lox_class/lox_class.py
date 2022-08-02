@@ -12,10 +12,18 @@ class Class(Callable):
         self.methods = methods
 
     def arity(self):
-        return 0
+        initializer = self.find_method('init')
+        if initializer is None:
+            return 0
+        return initializer.arity()
 
     def call(self, interpreter, arguments):
         instance = Instance(self)
+
+        initializer = self.find_method('init')
+        if initializer is not None:
+            initializer.bind(instance).call(interpreter, arguments)
+
         return instance
 
     def find_method(self, name):

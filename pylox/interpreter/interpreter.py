@@ -149,7 +149,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         methods = {}
         for method in stmt.methods:
-            methods[method.name.lexeme] = Function(method, self.environment)
+            methods[method.name.lexeme] = Function(method, self.environment, method.name.lexeme == 'init')
 
         klass = Class(stmt.name.lexeme, methods)
         self.environment.assign(stmt.name, klass)
@@ -160,7 +160,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         return None
 
     def visit_function_stmt(self, stmt):
-        function = Function(stmt, self.environment)
+        function = Function(stmt, self.environment, False)
         self.environment.define(stmt.name.lexeme, function)
         return None
 

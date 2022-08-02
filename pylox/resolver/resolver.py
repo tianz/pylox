@@ -28,7 +28,11 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.scopes[-1]['this'] = True
 
         for method in stmt.methods:
-            self.__resolve_function(method, FunctionType.METHOD)
+            function_type = FunctionType.METHOD
+            if method.name.lexeme == 'init':
+                function_type = FunctionType.INITIALIZER
+
+            self.__resolve_function(method, function_type)
 
         self.__end_scope()
         self.current_class = enclosing_class
@@ -61,6 +65,8 @@ class Resolver(ExprVisitor, StmtVisitor):
             self.had_error = True
 
         if stmt.value is not None:
+            if self.current_function == FunctionType.INITIALIZER:
+                ErrorReporter.token_error(stmt.keyword, "Can't return a value from an initializer.")
             self.__resolve(stmt.value)
         return None
 
