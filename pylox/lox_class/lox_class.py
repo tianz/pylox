@@ -1,5 +1,10 @@
+from enum import Enum
 from pylox.function.function import Callable
 from pylox.interpreter.runtime_error import RuntimeError
+
+class ClassType(Enum):
+    NONE = 0
+    CLASS = 1
 
 class Class(Callable):
     def __init__(self, name, methods):
@@ -33,7 +38,7 @@ class Instance:
 
         method = self.klass.find_method(name.lexeme)
         if method is not None:
-            return method
+            return method.bind(self)
 
         raise RuntimeError(name, f"Undefined property '{name.lexeme}'.")
 

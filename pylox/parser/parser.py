@@ -290,6 +290,8 @@ class Parser:
             return Expr.Literal(None)
         if self.__match(TokenType.NUMBER, TokenType.STRING):
             return Expr.Literal(self.__previous().literal)
+        if self.__match(TokenType.THIS):
+            return Expr.This(self.__previous())
         if self.__match(TokenType.IDENTIFIER):
             return Expr.Variable(self.__previous())
         if self.__match(TokenType.LEFT_PAREN):

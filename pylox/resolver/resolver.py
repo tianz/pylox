@@ -2,12 +2,14 @@ from pylox.ast.expr import ExprVisitor
 from pylox.ast.stmt import StmtVisitor
 import pylox.error.error as ErrorReporter
 from pylox.function.function import FunctionType
+from pylox.lox_class.lox_class import ClassType
 
 class Resolver(ExprVisitor, StmtVisitor):
     def __init__(self, interpreter):
         self.interpreter = interpreter
         self.scopes = []
         self.current_function = FunctionType.NONE
+        self.current_class = ClassType.NONE
         self.had_error = False
 
     def visit_block_stmt(self, stmt):
@@ -17,12 +19,19 @@ class Resolver(ExprVisitor, StmtVisitor):
         return None
 
     def visit_class_stmt(self, stmt):
+        enclosing_class = self.current_class
+        self.current_class = ClassType.CLASS
         self.__declare(stmt.name)
         self.__define(stmt.name)
+
+        self.__begin_scope()
+        self.scopes[-1]['this'] = True
 
         for method in stmt.methods:
             self.__resolve_function(method, FunctionType.METHOD)
 
+        self.__end_scope()
+        self.current_class = enclosing_class
         return None
 
     def visit_expression_stmt(self, stmt):
@@ -104,6 +113,15 @@ class Resolver(ExprVisitor, StmtVisitor):
         self.__resolve(expr.object)
         return None
 
+    def visit_this_expr(self, expr):
+        if self.current_class == ClassType.NONE:
+            ErrorReporter.token_error(expr.keyword, "Can't use 'this' outside of a class.")
+            self.had_error = True
+            return None
+
+        self.__resolve_local(expr, expr.keyword)
+        return None
+
     def visit_unary_expr(self, expr):
         self.__resolve(expr.right)
         return None
@@ -111,6 +129,7 @@ class Resolver(ExprVisitor, StmtVisitor):
     def visit_variable_expr(self, expr):
         if self.scopes and not self.scopes[-1][expr.name.lexeme]:
             ErrorReporter.token_error(expr.name, "Can't read local variable in its own initializer.")
+            self.had_error = True
 
         self.__resolve_local(expr, expr.name)
         return None
