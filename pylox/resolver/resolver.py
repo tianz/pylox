@@ -198,6 +198,7 @@ class Resolver(ExprVisitor, StmtVisitor):
     def __resolve_local(self, expr, name):
         for i in range(len(self.scopes) - 1, -1, -1):
             if name.lexeme in self.scopes[i]:
+                # let the interpreter store the expr at the current scope
                 self.interpreter.resolve(expr, len(self.scopes) - 1 - i)
                 return
 

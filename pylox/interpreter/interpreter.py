@@ -236,6 +236,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
             self.environment = previous_env
 
     def resolve(self, expr, depth):
+        # keep track of the depth of scopes an expression belongs to
         self.locals[expr] = depth
 
     def __evaluate(self, expr):
@@ -287,7 +288,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def __lookup_variable(self, name, expr):
         if expr in self.locals:
+            # for a local variable, find it at the correct scope determined by the resolver
             distance = self.locals[expr]
             return self.environment.get_at(distance, name.lexeme)
         else:
+            # otherwise, it is a global variable
             return self.globals.get(name)
