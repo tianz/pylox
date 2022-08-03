@@ -5,6 +5,7 @@ from pylox.interpreter.runtime_error import RuntimeError
 class ClassType(Enum):
     NONE = 0
     CLASS = 1
+    SUBCLASS = 2
 
 class Class(Callable):
     def __init__(self, name, superclass, methods):

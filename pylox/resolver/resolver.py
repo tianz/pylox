@@ -28,6 +28,8 @@ class Resolver(ExprVisitor, StmtVisitor):
             if stmt.name.lexeme == stmt.superclass.name.lexeme:
                 ErrorReporter.token_error(stmt.superclass.name, "A class can't inherit from itself.")
                 self.had_error = True
+
+            self.current_class = ClassType.SUBCLASS
             self.__resolve(stmt.superclass)
 
             self.__begin_scope()
@@ -133,6 +135,13 @@ class Resolver(ExprVisitor, StmtVisitor):
         return None
 
     def visit_super_expr(self, expr):
+        if self.current_class == ClassType.NONE:
+            ErrorReporter.token_error(expr.keyword, "Can't use 'super' outside of a class.")
+            self.had_error = True
+        elif self.current_class != ClassType.SUBCLASS:
+            ErrorReporter.token_error(expr.keyword, "Can't use 'super' in a class with no superclass.")
+            self.had_error = True
+
         self.__resolve_local(expr, expr.keyword)
         return None
 
