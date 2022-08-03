@@ -32,6 +32,12 @@ class Parser:
 
     def __class_declaration(self):
         name = self.__consume(TokenType.IDENTIFIER, 'Expect class name.')
+
+        superclass = None
+        if self.__match(TokenType.LESS):
+            self.__consume(TokenType.IDENTIFIER, 'Expect superclass name.')
+            superclass = Expr.Variable(self.__previous())
+
         self.__consume(TokenType.LEFT_BRACE, "Expect '(' before class body.")
         methods = []
 
@@ -40,7 +46,7 @@ class Parser:
 
         self.__consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
 
-        return Stmt.Class(name, methods)
+        return Stmt.Class(name, superclass, methods)
 
     def __function(self, kind):
         # header

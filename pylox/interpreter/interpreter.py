@@ -21,7 +21,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
             for statement in statements:
                 self.__execute(statement)
         except RuntimeError as err:
-            print(f'{err.message}\n[line {err.token.line}]')
+            print(f'[line {err.token.line}] {err.message}')
             self.had_error = True
 
     def visit_assign_expr(self, expr):
@@ -145,13 +145,19 @@ class Interpreter(ExprVisitor, StmtVisitor):
         return None
 
     def visit_class_stmt(self, stmt):
+        superclass = None
+        if stmt.superclass is not None:
+            superclass = self.__evaluate(stmt.superclass)
+            if not isinstance(superclass, Class):
+                raise RuntimeError(stmt.superclass.name, 'Superclass must be a class.')
+
         self.environment.define(stmt.name.lexeme, None)
 
         methods = {}
         for method in stmt.methods:
             methods[method.name.lexeme] = Function(method, self.environment, method.name.lexeme == 'init')
 
-        klass = Class(stmt.name.lexeme, methods)
+        klass = Class(stmt.name.lexeme, superclass, methods)
         self.environment.assign(stmt.name, klass)
         return None
 
