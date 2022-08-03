@@ -30,6 +30,9 @@ class Resolver(ExprVisitor, StmtVisitor):
                 self.had_error = True
             self.__resolve(stmt.superclass)
 
+            self.__begin_scope()
+            self.scopes[-1]['super'] = True
+
         self.__begin_scope()
         self.scopes[-1]['this'] = True
 
@@ -41,6 +44,10 @@ class Resolver(ExprVisitor, StmtVisitor):
             self.__resolve_function(method, function_type)
 
         self.__end_scope()
+
+        if stmt.superclass is not None:
+            self.__end_scope()
+
         self.current_class = enclosing_class
         return None
 
@@ -123,6 +130,10 @@ class Resolver(ExprVisitor, StmtVisitor):
     def visit_set_expr(self, expr):
         self.__resolve(expr.value)
         self.__resolve(expr.object)
+        return None
+
+    def visit_super_expr(self, expr):
+        self.__resolve_local(expr, expr.keyword)
         return None
 
     def visit_this_expr(self, expr):

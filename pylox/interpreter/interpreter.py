@@ -122,6 +122,20 @@ class Interpreter(ExprVisitor, StmtVisitor):
         object.set(expr.name, value)
         return value
 
+    def visit_super_expr(self, expr):
+        distance = self.locals.get(expr)
+        superclass = self.environment.get_at(distance, 'super')
+        # bind "this". "this" should be the instance of the subclass
+        # the environment whre "this" is bound is always right inside the environment where "super" is bound
+        # because of how visit_class_stmt in resolver works
+        object = self.environment.get_at(distance - 1, 'this')
+        method = superclass.find_method(expr.method.lexeme)
+
+        if method is None:
+            raise RuntimeError(expr.method, f"Undefined property '{expr.method.lexeme}'.")
+
+        return method.bind(object)
+
     def visit_this_expr(self, expr):
         return self.__lookup_variable(expr.keyword, expr)
 
@@ -153,9 +167,16 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         self.environment.define(stmt.name.lexeme, None)
 
+        if stmt.superclass is not None:
+            self.environment = Environment(self.environment)
+            self.environment.define('super', superclass)
+
         methods = {}
         for method in stmt.methods:
             methods[method.name.lexeme] = Function(method, self.environment, method.name.lexeme == 'init')
+
+        if superclass is not None:
+            self.environment = self.environment.enclosing
 
         klass = Class(stmt.name.lexeme, superclass, methods)
         self.environment.assign(stmt.name, klass)
