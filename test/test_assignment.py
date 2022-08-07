@@ -1,7 +1,6 @@
 from textwrap import dedent
 import unittest
 
-import lox
 from test_util import test_pylox
 
 class TestAssignment(unittest.TestCase):
