@@ -5,7 +5,7 @@ import lox
 
 def test_pylox(test, input, expected):
     with io.StringIO() as buf, redirect_stdout(buf):
-            lox.run_file(f'test/resources/{input}')
-            actual = buf.getvalue()
+        lox.run_file(f'test/resources/{input}')
+        actual = buf.getvalue()
 
-            test.assertEqual(expected, actual)
+        test.assertEqual(expected, actual)
