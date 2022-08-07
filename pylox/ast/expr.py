@@ -75,9 +75,9 @@ class Binary(Expr):
         return f'Binary {{ left={self.left} operator={self.operator} right={self.right} }}'
 
 class Call(Expr):
-    def __init__(self, callee, paren, arguments):
+    def __init__(self, callee, right_paren, arguments):
         self.callee = callee
-        self.paren = paren
+        self.right_paren = right_paren
         self.arguments = arguments
 
     def accept(self, visitor):
