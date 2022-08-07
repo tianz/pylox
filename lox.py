@@ -19,6 +19,9 @@ def run_prompt():
         had_error = False
 
 def run_file(path):
+    global had_error
+    global had_runtime_error
+
     with open(path) as f:
         run(f.read())
 
@@ -29,6 +32,7 @@ def run_file(path):
 
 def run(source):
     global had_error
+    global had_runtime_error
 
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
@@ -49,6 +53,8 @@ def run(source):
         return
 
     interpreter.interpret(statements)
+    if interpreter.had_error:
+        had_runtime_error = True
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
