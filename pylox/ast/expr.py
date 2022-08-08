@@ -152,3 +152,6 @@ class Variable(Expr):
 
     def accept(self, visitor):
         return visitor.visit_variable_expr(self)
+
+    def __str__(self):
+        return f'Variable {{ name={self.name} }}'

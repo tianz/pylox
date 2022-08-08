@@ -159,7 +159,9 @@ class Resolver(ExprVisitor, StmtVisitor):
         return None
 
     def visit_variable_expr(self, expr):
-        if self.scopes and not self.scopes[-1][expr.name.lexeme]:
+        if self.scopes and expr.name.lexeme in self.scopes[-1] and self.scopes[-1][expr.name.lexeme] == False:
+            print(expr)
+            print(self.scopes)
             ErrorReporter.token_error(expr.name, "Can't read local variable in its own initializer.")
             self.had_error = True
 
