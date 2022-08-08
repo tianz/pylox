@@ -3,7 +3,7 @@ import unittest
 
 from test_util import test_pylox
 
-class TestBlock(unittest.TestCase):
+class TestComments(unittest.TestCase):
     def test_line_at_eof(self):
         expected = dedent("""\
             ok

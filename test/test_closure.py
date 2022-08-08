@@ -3,7 +3,7 @@ import unittest
 
 from test_util import test_pylox
 
-class TestCall(unittest.TestCase):
+class TestClosure(unittest.TestCase):
     def test_assign_to_closure(self):
         expected = dedent("""\
             local
