@@ -82,6 +82,7 @@ class Resolver(ExprVisitor, StmtVisitor):
         if stmt.value is not None:
             if self.current_function == FunctionType.INITIALIZER:
                 ErrorReporter.token_error(stmt.keyword, "Can't return a value from an initializer.")
+                self.had_error = True
             self.__resolve(stmt.value)
         return None
 
