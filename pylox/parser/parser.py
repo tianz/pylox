@@ -188,6 +188,7 @@ class Parser:
                 return Expr.Set(expr.object, expr.name, value)
 
             ErrorReporter.token_error(equals, 'Invalid assignment target.')
+            self.had_error = True
 
         return expr
 
@@ -345,8 +346,8 @@ class Parser:
         return self.tokens[self.current - 1]
 
     def __error(self, token, message):
-        self.had_error = True
         ErrorReporter.token_error(token, message)
+        self.had_error = True
         return ParserError()
 
     def __synchronize(self):

@@ -1,7 +1,7 @@
 from textwrap import dedent
 import unittest
 
-from test_util import test_error
+from test_util import test_error, test_pylox
 
 class TestCall(unittest.TestCase):
     def test_bool(self):
