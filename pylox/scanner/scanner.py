@@ -89,7 +89,7 @@ class Scanner:
             case _:
                 if c.isdigit():
                     self.__number()
-                elif c.isalpha():
+                elif self.__isalpha(c):
                     self.__identifier()
                 else:
                     ErrorReporter.line_error(self.line, 'Unexpected character.')
@@ -125,7 +125,7 @@ class Scanner:
         self.__add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
 
     def __identifier(self):
-        while self.__peek().isalnum():
+        while self.__isalnum(self.__peek()):
             self.__advance()
 
         text = self.source[self.start : self.current]
@@ -159,6 +159,12 @@ class Scanner:
     def __add_token(self, type, literal=None):
         text = self.source[self.start : self.current]
         self.tokens.append(Token(type, text, literal, self.line))
+
+    def __isalpha(self, c):
+        return 'a' <= c <= 'z' or 'A' <= c <= 'Z' or c == '_'
+
+    def __isalnum(self, c):
+        return self.__isalpha(c) or c.isdigit()
 
     def __is_at_end(self):
         return self.current >= len(self.source)
