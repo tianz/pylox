@@ -1,7 +1,7 @@
 from textwrap import dedent
 import unittest
 
-from test_util import test_pylox
+from test_util import test_pylox, test_error
 
 class TestAssignment(unittest.TestCase):
     def test_associativity(self):
@@ -73,4 +73,4 @@ class TestAssignment(unittest.TestCase):
             [line 1] Undefined variable 'unknown'.
             """)
 
-        test_pylox(self, 'assignment/undefined.lox', expected)
+        test_error(self, 'assignment/undefined.lox', expected, 70)
