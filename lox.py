@@ -33,6 +33,11 @@ def run_file(path):
 def run(source):
     global had_error
     global had_runtime_error
+    global interpreter
+
+    had_error = False
+    had_runtime_error = False
+    interpreter.had_error = False
 
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
