@@ -258,6 +258,8 @@ class Interpreter(ExprVisitor, StmtVisitor):
             return True
         if a is None:
             return False
+        if type(a) != type(b):
+            return False
 
         return a == b
 
