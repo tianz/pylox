@@ -94,7 +94,7 @@ class Parser:
 
     def __expression_statement(self):
         expr = self.__expression()
-        self.__consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        self.__consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Expression(expr)
 
     def __for_statement(self):
@@ -122,8 +122,10 @@ class Parser:
         body = self.__statement()
         if increment:
             body = Stmt.Block([body, Stmt.Expression(increment)])
-        if condition:
-            body = Stmt.While(condition, body)
+        if condition is None:
+            # when condition is omitted, it's considered true
+            condition = Expr.Literal(True)
+        body = Stmt.While(condition, body)
         if initializer:
             body = Stmt.Block([initializer, body])
 

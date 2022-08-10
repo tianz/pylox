@@ -48,6 +48,9 @@ class Block(Stmt):
     def accept(self, visitor):
         return visitor.visit_block_stmt(self)
 
+    def __str__(self):
+        return f'Block {{ statements={self.statements} }}'
+
 class Class(Stmt):
     def __init__(self, name, superclass, methods):
         self.name = name
@@ -104,6 +107,9 @@ class Var(Stmt):
 
     def accept(self, visitor):
         return visitor.visit_var_stmt(self)
+
+    def __str__(self):
+        return f'Var {{ name={self.name} initializer={self.initializer} }}'
 
 class While(Stmt):
     def __init__(self, condition, body):

@@ -105,6 +105,9 @@ class Literal(Expr):
     def accept(self, visitor):
         return visitor.visit_literal_expr(self)
 
+    def __str__(self):
+        return f'Literal {{ value={self.value} }}'
+
 class Logical(Expr):
     def __init__(self, left, operator, right):
         self.left = left
