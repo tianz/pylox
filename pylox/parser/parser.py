@@ -269,10 +269,9 @@ class Parser:
             if not self.__check(TokenType.RIGHT_PAREN):
                 arguments = [self.__expression()]
                 while self.__match(TokenType.COMMA):
-                    arguments.append(self.__expression())
-
                     if len(arguments) >= 255:
                         self.__error(self.__peek(), "Can't have more than 255 arguments.")
+                    arguments.append(self.__expression())
 
             right_paren = self.__consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
             return Expr.Call(callee, right_paren, arguments)
