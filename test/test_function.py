@@ -80,6 +80,12 @@ class TestFunction(unittest.TestCase):
             """)
         test_pylox(self, 'function/print.lox', expected)
 
+    def test_recursion(self):
+        expected = dedent("""\
+            21
+            """)
+        test_pylox(self, 'function/recursion.lox', expected)
+
     def test_too_many_arguments(self):
         expected = dedent("""\
             [line 260] Error at 'a': Can't have more than 255 arguments.
